@@ -78,7 +78,6 @@ export default function MultiLobby({ socket, onBack }) {
           </div>
           <div className="ml-choices stagger">
             <button className="choice-card" onClick={() => setView("create")}>
-              <span className="choice-icon">🏠</span>
               <div>
                 <div className="choice-name display">CRÉER UNE ROOM</div>
                 <div className="choice-desc">Génère un code et invite tes amis</div>
@@ -86,7 +85,6 @@ export default function MultiLobby({ socket, onBack }) {
               <span className="choice-arrow">→</span>
             </button>
             <button className="choice-card choice-card--join" onClick={() => setView("join")}>
-              <span className="choice-icon">🔗</span>
               <div>
                 <div className="choice-name display">REJOINDRE</div>
                 <div className="choice-desc">Entre le code d'un ami</div>
@@ -139,7 +137,7 @@ export default function MultiLobby({ socket, onBack }) {
             {view === "create" && (
               <div className="option-row card">
                 <div className="option-info">
-                  <span className="option-label">🃏 Carte Blanche</span>
+                  <span className="option-label">Carte Blanche</span>
                   <span className="option-desc">Ajouter un Mr White</span>
                 </div>
                 <label className="toggle">
@@ -156,7 +154,7 @@ export default function MultiLobby({ socket, onBack }) {
               onClick={view === "create" ? handleCreate : handleJoin}
               disabled={loading}
             >
-              {loading ? "Connexion…" : view === "create" ? "Créer la room 🚀" : "Rejoindre 🎮"}
+              {loading ? "Connexion…" : view === "create" ? "Créer la room" : "Rejoindre"}
             </button>
           </div>
         </div>
@@ -199,7 +197,7 @@ export default function MultiLobby({ socket, onBack }) {
             <div className="host-settings card animate-in">
               <div className="option-row">
                 <div className="option-info">
-                  <span className="option-label">🃏 Carte Blanche</span>
+                  <span className="option-label">Carte Blanche</span>
                   <span className="option-desc">Ajouter un Mr White</span>
                 </div>
                 <label className="toggle">
@@ -222,7 +220,7 @@ export default function MultiLobby({ socket, onBack }) {
               disabled={room.players.length < 4}
               onClick={handleStartGame}
             >
-              Lancer la partie 🎭
+              Lancer la partie
             </button>
           ) : (
             <div className="waiting-host animate-in card">

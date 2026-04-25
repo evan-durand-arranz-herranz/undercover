@@ -12,7 +12,6 @@ export default function GameOver({ winner, players, wordPair, onRestart, onHome 
       </div>
       <div className="container">
         <div className="go-header animate-in">
-          <div className="go-icon">{civilWon ? "🏆" : "🕵️"}</div>
           <h2 className="display go-title">
             {civilWon ? "CIVILS\nVICTORIEUX" : "UNDERCOVER\nGAGNE"}
           </h2>
@@ -76,7 +75,7 @@ export default function GameOver({ winner, players, wordPair, onRestart, onHome 
 
         <div className="go-actions stagger">
           <button className="btn btn-primary" onClick={onRestart}>
-            Rejouer 🔄
+            Rejouer
           </button>
           <button className="btn btn-ghost" onClick={onHome}>
             Retour à l'accueil

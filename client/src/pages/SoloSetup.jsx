@@ -71,7 +71,7 @@ export default function SoloSetup({ onStart, onBack }) {
 
         <div className="option-row card animate-in">
           <div className="option-info">
-            <span className="option-label">🃏 Carte Blanche (Mr White)</span>
+            <span className="option-label">Carte Blanche (Mr White)</span>
             <span className="option-desc">Un joueur ne reçoit aucun mot — s'il est éliminé, il peut tenter de deviner le mot des civils</span>
           </div>
           <label className="toggle">
@@ -83,7 +83,7 @@ export default function SoloSetup({ onStart, onBack }) {
         {error && <p className="error-msg animate-in">{error}</p>}
 
         <button className="btn btn-primary animate-in" onClick={handleStart}>
-          Distribuer les rôles 🎭
+          Distribuer les rôles
         </button>
       </div>
     </div>

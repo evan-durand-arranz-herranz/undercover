@@ -13,7 +13,6 @@ export default function Home({ onSelectMode }) {
 
       <div className="home-content container">
         <div className="home-header animate-in">
-          <div className="home-eye">👁️</div>
           <h1 className="display home-title">UNDER<br />COVER</h1>
           <p className="home-subtitle">Qui est l'imposteur parmi vous ?</p>
         </div>
@@ -25,7 +24,6 @@ export default function Home({ onSelectMode }) {
             onMouseEnter={() => setHovered("solo")}
             onMouseLeave={() => setHovered(null)}
           >
-            <div className="mode-icon">📱</div>
             <div className="mode-info">
               <h2 className="mode-name display">MODE SOLO</h2>
               <p className="mode-desc">Un seul téléphone, on se le passe à chaque tour</p>
@@ -39,7 +37,6 @@ export default function Home({ onSelectMode }) {
             onMouseEnter={() => setHovered("multi")}
             onMouseLeave={() => setHovered(null)}
           >
-            <div className="mode-icon">🌐</div>
             <div className="mode-info">
               <h2 className="mode-name display">MODE MULTI</h2>
               <p className="mode-desc">Chacun joue sur son propre téléphone</p>
@@ -51,10 +48,10 @@ export default function Home({ onSelectMode }) {
         <div className="home-rules card animate-in">
           <h3 className="rules-title">Comment jouer ?</h3>
           <ul className="rules-list">
-            <li>🔴 Les <strong>civils</strong> reçoivent le même mot secret</li>
-            <li>🕵️ L'<strong>undercover</strong> reçoit un mot similaire</li>
-            <li>💬 Chacun donne un indice sans révéler son mot</li>
-            <li>🗳️ On vote pour éliminer l'imposteur</li>
+            <li>Les <strong>civils</strong> reçoivent le même mot secret</li>
+            <li>L'<strong>undercover</strong> reçoit un mot similaire</li>
+            <li>Chacun donne un indice sans révéler son mot</li>
+            <li>On vote pour éliminer l'imposteur</li>
           </ul>
         </div>
       </div>

@@ -5,19 +5,16 @@ const ROLE_CONFIG = {
   civil: {
     label: "CIVIL",
     color: "teal",
-    icon: "👤",
     desc: "Vous connaissez le mot. Donnez des indices sans trahir votre identité.",
   },
   undercover: {
     label: "UNDERCOVER",
     color: "red",
-    icon: "🕵️",
     desc: "Votre mot est légèrement différent. Bluffez sans vous faire démasquer !",
   },
   mrwhite: {
     label: "MR WHITE",
     color: "gold",
-    icon: "🃏",
     desc: "Vous n'avez aucun mot. Improvisez et essayez de deviner discrètement.",
   },
 };
@@ -40,7 +37,6 @@ export default function RoleReveal({ player, playerIndex, totalPlayers, visible,
           <div className="rv-pass-indicator">
             <span className="rv-pass-num">{playerIndex + 1}/{totalPlayers}</span>
           </div>
-          <div className="rv-eye">👁️</div>
           <h2 className="display rv-pass-title">
             À toi,<br />{player.name} !
           </h2>
@@ -57,7 +53,6 @@ export default function RoleReveal({ player, playerIndex, totalPlayers, visible,
       {revealed && (
         <div className="rv-card-wrapper container animate-in">
           <div className={`rv-card rv-card--${config.color}`}>
-            <div className="rv-role-icon">{config.icon}</div>
             <div className={`rv-role-badge badge badge-${config.color}`}>{config.label}</div>
             {player.word ? (
               <div className="rv-word-area">
@@ -74,7 +69,7 @@ export default function RoleReveal({ player, playerIndex, totalPlayers, visible,
           </div>
 
           <button className="btn btn-primary" onClick={handleDone}>
-            J'ai mémorisé, cacher 🙈
+            J'ai mémorisé, cacher
           </button>
           <p className="rv-warning">Ne montre pas ton écran aux autres !</p>
         </div>

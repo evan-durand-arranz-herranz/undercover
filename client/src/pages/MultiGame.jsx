@@ -99,9 +99,6 @@ export default function MultiGame({ socket, initialRoom, onHome }) {
 
           {myRole ? (
             <div className={`mg-role-card card animate-in ${myRole.role === "undercover" ? "mg-card--uc" : myRole.role === "mrwhite" ? "mg-card--white" : "mg-card--civil"}`}>
-              <div className="mg-role-icon">
-                {myRole.role === "civil" ? "👤" : myRole.role === "undercover" ? "🕵️" : "🃏"}
-              </div>
               <div className={`badge ${myRole.role === "civil" ? "badge-teal" : myRole.role === "undercover" ? "badge-red" : "badge-gold"}`}>
                 {myRole.role === "civil" ? "CIVIL" : myRole.role === "undercover" ? "UNDERCOVER" : "MR WHITE"}
               </div>
@@ -144,7 +141,7 @@ export default function MultiGame({ socket, initialRoom, onHome }) {
 
           {isHost && myRole && (
             <button className="btn btn-primary animate-in" onClick={handleNextPhase}>
-              Lancer la discussion 💬
+              Lancer la discussion
             </button>
           )}
           {!isHost && (
@@ -193,13 +190,13 @@ export default function MultiGame({ socket, initialRoom, onHome }) {
 
           {isEliminated && (
             <div className="mg-eliminated card animate-in">
-              💀 Tu as été éliminé·e — tu peux observer.
+              Tu as été éliminé·e — tu peux observer.
             </div>
           )}
 
           {isHost ? (
             <button className="btn btn-primary animate-in" onClick={handleNextPhase}>
-              Passer au vote 🗳️
+              Passer au vote
             </button>
           ) : (
             <div className="mg-host-wait card animate-in">
@@ -222,7 +219,7 @@ export default function MultiGame({ socket, initialRoom, onHome }) {
               <h2 className="display mg-title">VOTE</h2>
             </div>
             <div className="mg-eliminated card animate-in">
-              💀 Tu as été éliminé·e — tu observes le vote.
+              Tu as été éliminé·e — tu observes le vote.
             </div>
             <div className="mg-host-wait card animate-in">
               <div className="waiting-spinner" />

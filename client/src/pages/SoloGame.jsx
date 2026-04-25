@@ -28,39 +28,20 @@ export default function SoloGame({ players: playerNames, includeWhite, onBack })
     }
   };
 
-  const handleVoteSubmit = (votes) => {
-    // Count votes
-    const counts = {};
-    Object.values(votes).forEach((id) => {
-      counts[id] = (counts[id] || 0) + 1;
-    });
-    const maxVotes = Math.max(...Object.values(counts));
-    const eliminated = Object.keys(counts).filter((id) => counts[id] === maxVotes);
-
-    let eliminatedId = null;
-    let updatedPlayers = game.players;
-
-    if (eliminated.length === 1) {
-      eliminatedId = parseInt(eliminated[0]);
-      updatedPlayers = game.players.map((p) =>
-        p.id === eliminatedId ? { ...p, eliminated: true } : p
-      );
-    }
-
-    const eliminatedPlayer = eliminatedId !== null
-      ? game.players.find((p) => p.id === eliminatedId)
-      : null;
+  const handleVoteSubmit = (targetId) => {
+    const eliminatedPlayer = game.players.find((p) => p.id === targetId) || null;
+    const updatedPlayers = eliminatedPlayer
+      ? game.players.map((p) => (p.id === targetId ? { ...p, eliminated: true } : p))
+      : game.players;
 
     setVoteResult({
-      eliminatedId,
+      eliminatedId: targetId,
       eliminatedName: eliminatedPlayer?.name,
       eliminatedRole: eliminatedPlayer?.role,
-      isTie: eliminated.length > 1,
-      votes,
-      counts,
+      isTie: false,
     });
 
-    setGame({ ...game, players: updatedPlayers, phase: "vote-result", votes });
+    setGame({ ...game, players: updatedPlayers, phase: "vote-result" });
   };
 
   const handleAfterVoteResult = () => {
@@ -68,7 +49,7 @@ export default function SoloGame({ players: playerNames, includeWhite, onBack })
     if (win.over) {
       setGame({ ...game, phase: "game-over", winner: win.winner });
     } else {
-      setGame({ ...game, phase: "discussion", roundNumber: game.roundNumber + 1, votes: {} });
+      setGame({ ...game, phase: "discussion", roundNumber: game.roundNumber + 1 });
       setVoteResult(null);
     }
   };
@@ -114,7 +95,7 @@ export default function SoloGame({ players: playerNames, includeWhite, onBack })
             className="btn btn-primary animate-in"
             onClick={() => setGame({ ...game, phase: "vote" })}
           >
-            Passer au vote 🗳️
+            Passer au vote
           </button>
           <button className="btn btn-ghost" onClick={onBack}>Abandonner</button>
         </div>

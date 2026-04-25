@@ -2,47 +2,23 @@ import { useState } from "react";
 import "./VotePanel.css";
 
 export default function VotePanel({ players, onVoteComplete, isSolo = false, myId = null, onVote = null, votes = {}, allVoted = false }) {
-  // For solo: collect all votes locally then submit
-  const [soloVotes, setSoloVotes] = useState({});
-  const [currentVoterIndex, setCurrentVoterIndex] = useState(0);
-  const [hasVoted, setHasVoted] = useState(false);
   const [selectedTarget, setSelectedTarget] = useState(null);
 
   const alivePlayers = players.filter((p) => !p.eliminated);
 
-  // SOLO MODE
+  // SOLO MODE — vote général à l'oral, on confirme la décision collective
   if (isSolo) {
-    const voter = alivePlayers[currentVoterIndex];
-    const eligibleTargets = alivePlayers.filter((p) => p.id !== voter.id);
-
-    const handleSoloVote = () => {
-      if (selectedTarget === null) return;
-      const newVotes = { ...soloVotes, [voter.id]: selectedTarget };
-      setSoloVotes(newVotes);
-
-      const next = currentVoterIndex + 1;
-      if (next >= alivePlayers.length) {
-        onVoteComplete(newVotes);
-      } else {
-        setCurrentVoterIndex(next);
-        setSelectedTarget(null);
-        setHasVoted(false);
-      }
-    };
-
     return (
       <div className="screen vote-panel">
         <div className="container">
           <div className="vote-header animate-in">
-            <div className="badge badge-red">Vote {currentVoterIndex + 1}/{alivePlayers.length}</div>
+            <div className="badge badge-red">Vote</div>
             <h2 className="display vote-title">QUI ÉLIMINER ?</h2>
-            <p className="vote-voter">
-              <span className="voter-name">{voter.name}</span>, vote en secret
-            </p>
+            <p className="vote-voter">Votez à l'oral, puis confirmez la décision du groupe</p>
           </div>
 
           <div className="vote-targets stagger">
-            {eligibleTargets.map((target) => (
+            {alivePlayers.map((target) => (
               <button
                 key={target.id}
                 className={`vote-target ${selectedTarget === target.id ? "vote-target--selected" : ""}`}
@@ -58,9 +34,9 @@ export default function VotePanel({ players, onVoteComplete, isSolo = false, myI
           <button
             className="btn btn-primary animate-in"
             disabled={selectedTarget === null}
-            onClick={handleSoloVote}
+            onClick={() => onVoteComplete(selectedTarget)}
           >
-            Confirmer mon vote
+            Confirmer l'élimination
           </button>
         </div>
       </div>
