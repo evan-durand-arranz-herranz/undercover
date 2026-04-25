@@ -1,0 +1,215 @@
+.multi-game {
+  padding-top: 20px;
+  padding-bottom: 40px;
+}
+
+.multi-game .container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 20px;
+}
+
+.mg-header {
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.room-tag {
+  display: inline-flex;
+  margin-bottom: 8px;
+}
+
+.mg-title {
+  font-size: 3rem;
+  line-height: 1;
+  background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.mg-sub {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-top: 6px;
+}
+
+/* Role card */
+.mg-role-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 28px 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.mg-role-card::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  filter: blur(50px);
+  opacity: 0.15;
+}
+
+.mg-card--civil::before { background: var(--teal); }
+.mg-card--uc::before { background: var(--accent); }
+.mg-card--white::before { background: var(--gold); }
+
+.mg-card--civil { border-color: rgba(42,157,143,0.2); }
+.mg-card--uc { border-color: rgba(230,57,70,0.2); }
+.mg-card--white { border-color: rgba(244,162,97,0.2); }
+
+.mg-role-icon {
+  font-size: 2.5rem;
+  position: relative;
+}
+
+.mg-word-area {
+  text-align: center;
+  position: relative;
+}
+
+.mg-word-label {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.mg-word {
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.mg-no-word {
+  color: var(--text-muted);
+}
+
+.mg-role-hint {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.5;
+  max-width: 260px;
+  position: relative;
+}
+
+/* Players */
+.mg-players {
+  padding: 16px;
+}
+
+.mg-section-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.mg-player-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mg-player-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mg-player-avatar {
+  width: 32px;
+  height: 32px;
+  background: var(--surface2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  color: var(--accent);
+}
+
+.mg-player-name {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* My word reminder */
+.mg-my-word {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+}
+
+.mg-my-word-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  flex-shrink: 0;
+}
+
+.mg-my-word-value {
+  font-size: 1.4rem;
+  color: var(--teal);
+}
+
+/* Eliminated */
+.mg-eliminated {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 14px;
+}
+
+/* Waiting */
+.mg-waiting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 28px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.mg-host-wait {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+.waiting-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--teal);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
