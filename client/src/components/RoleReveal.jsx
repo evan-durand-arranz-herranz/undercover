@@ -3,11 +3,6 @@ import { Silhouette, Stamp } from "./ui";
 import "./RoleReveal.css";
 
 const ROLE_CONFIG = {
-  civil: {
-    label: "CIVIL",
-    color: "var(--green-stamp)",
-    desc: "Donne des indices sur ton mot sans le révéler.",
-  },
   mrwhite: {
     label: "MR WHITE",
     color: "var(--gold)",
@@ -18,9 +13,7 @@ const ROLE_CONFIG = {
 export default function RoleReveal({ player, playerIndex, totalPlayers, visible, onAcknowledge }) {
   const [revealed, setRevealed] = useState(false);
 
-  // undercover appears as civil
-  const displayRole = player.role === "mrwhite" ? "mrwhite" : "civil";
-  const config = ROLE_CONFIG[displayRole];
+  const isMrWhite = player.role === "mrwhite";
 
   const handleDone = () => {
     setRevealed(false);
@@ -111,10 +104,13 @@ export default function RoleReveal({ player, playerIndex, totalPlayers, visible,
 
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
                 <Silhouette size={60} color="var(--ink)" bg="var(--paper-3)" />
-                <div style={{ textAlign: 'center' }}>
-                  <div className="mono-label">STATUT</div>
-                  <div className="title-serif" style={{ fontSize: 48, lineHeight: 1, color: 'var(--ink)' }}>{config.label}</div>
-                </div>
+
+                {isMrWhite && (
+                  <div style={{ textAlign: 'center' }}>
+                    <div className="mono-label">STATUT</div>
+                    <div className="title-serif" style={{ fontSize: 48, lineHeight: 1, color: 'var(--ink)' }}>MR WHITE</div>
+                  </div>
+                )}
 
                 <div style={{
                   padding: '10px 16px', border: '1.5px solid var(--ink)', borderRadius: 6,

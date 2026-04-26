@@ -66,8 +66,7 @@ export default function MultiGame({ socket, initialRoom, initialRole, onHome }) 
 
   // ── ROLE REVEAL ──
   if (room.phase === "role-reveal") {
-    // undercover shows as civil (no role leak)
-    const displayRole = myRole?.role === "mrwhite" ? "mrwhite" : "civil";
+    const isMrWhite = myRole?.role === "mrwhite";
 
     return (
       <div className="paper-dark no-scroll" style={{ minHeight: '100dvh', overflow: 'auto', color: 'var(--paper)' }}>
@@ -87,60 +86,43 @@ export default function MultiGame({ socket, initialRoom, initialRole, onHome }) 
               background: 'var(--paper-2)', borderRadius: 12, padding: '24px 20px',
               position: 'relative', overflow: 'hidden',
             }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
-                <div className="mono-label">STATUT</div>
-                <div style={{
-                  fontFamily: 'var(--mono)', fontSize: 9, fontWeight: 700, letterSpacing: '0.14em',
-                  padding: '4px 8px', borderRadius: 4,
-                  background: displayRole === 'mrwhite' ? 'var(--gold)' : 'var(--green-stamp)',
-                  color: 'var(--paper)',
-                }}>
-                  {displayRole === 'mrwhite' ? 'MR WHITE' : 'CIVIL'}
+              {isMrWhite && (
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
+                  <div style={{
+                    fontFamily: 'var(--mono)', fontSize: 9, fontWeight: 700, letterSpacing: '0.14em',
+                    padding: '4px 8px', borderRadius: 4,
+                    background: 'var(--gold)', color: 'var(--paper)',
+                  }}>MR WHITE</div>
                 </div>
-              </div>
-              <div style={{ textAlign: 'center', padding: '8px 0 16px' }}>
-                <Silhouette size={60} color="var(--ink)" bg="var(--paper-3)" />
-                <div className="title-serif" style={{ fontSize: 40, lineHeight: 1, color: 'var(--ink)', marginTop: 10 }}>
-                  {displayRole === 'mrwhite' ? 'MR WHITE' : 'CIVIL'}
+              )}
+              {isMrWhite && (
+                <div style={{ textAlign: 'center', padding: '8px 0 16px' }}>
+                  <Silhouette size={60} color="var(--ink)" bg="var(--paper-3)" />
+                  <div className="title-serif" style={{ fontSize: 40, lineHeight: 1, color: 'var(--ink)', marginTop: 10 }}>
+                    MR WHITE
+                  </div>
                 </div>
-              </div>
+              )}
+              {!isMrWhite && (
+                <div style={{ textAlign: 'center', padding: '8px 0 16px' }}>
+                  <Silhouette size={60} color="var(--ink)" bg="var(--paper-3)" />
+                </div>
+              )}
               <div style={{
                 padding: '14px 16px', border: '1.5px solid var(--line)', borderRadius: 6,
-                background: 'rgba(255,255,255,0.4)',
+                background: 'rgba(255,255,255,0.4)', textAlign: 'center',
               }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                  <div className="mono-label">MOT DE PASSE</div>
-                  {myRole.word && (
-                    <button
-                      onClick={() => setWordVisible(v => !v)}
-                      style={{
-                        background: 'none', border: '1px solid var(--line)', borderRadius: 4,
-                        fontFamily: 'var(--mono)', fontSize: 8, fontWeight: 700, letterSpacing: '0.1em',
-                        color: 'var(--ink-soft)', padding: '3px 8px', cursor: 'pointer',
-                      }}
-                    >
-                      {wordVisible ? 'CACHER' : 'RÉVÉLER'}
-                    </button>
-                  )}
-                </div>
-                <div style={{ textAlign: 'center' }}>
-                  {myRole.word ? (
-                    wordVisible ? (
-                      <div className="title-serif" style={{ fontSize: 30, color: 'var(--accent)', lineHeight: 1 }}>
-                        {myRole.word.toUpperCase()}
-                      </div>
-                    ) : (
-                      <div style={{ fontFamily: 'var(--mono)', fontSize: 22, color: 'var(--muted)', letterSpacing: '0.5em' }}>
-                        ● ● ● ●
-                      </div>
-                    )
-                  ) : (
-                    <div className="title-serif" style={{ fontSize: 30, color: 'var(--muted)', lineHeight: 1 }}>???</div>
-                  )}
-                </div>
+                <div className="mono-label" style={{ marginBottom: 8 }}>MOT DE PASSE</div>
+                {myRole.word ? (
+                  <div className="title-serif" style={{ fontSize: 30, color: 'var(--accent)', lineHeight: 1 }}>
+                    {myRole.word.toUpperCase()}
+                  </div>
+                ) : (
+                  <div className="title-serif" style={{ fontSize: 30, color: 'var(--muted)', lineHeight: 1 }}>???</div>
+                )}
               </div>
               <div style={{ marginTop: 12, fontFamily: 'var(--sans)', fontSize: 12, color: 'var(--ink-soft)', textAlign: 'center' }}>
-                {displayRole === 'mrwhite'
+                {isMrWhite
                   ? "Tu n'as pas de mot. Écoute et improvise."
                   : "Donne des indices sur ton mot sans le révéler."}
               </div>
@@ -235,9 +217,19 @@ export default function MultiGame({ socket, initialRoom, initialRole, onHome }) 
               <div>
                 <div className="mono-label" style={{ color: 'rgba(241,233,214,0.5)', fontSize: 9 }}>TON MOT</div>
                 <div className="title-serif" style={{ fontSize: 22, color: 'var(--paper)', marginTop: 2 }}>
-                  {myRole.word || '???'}
+                  {wordVisible ? (myRole.word || '???') : '● ● ● ●'}
                 </div>
               </div>
+              <button
+                onClick={() => setWordVisible(v => !v)}
+                style={{
+                  background: 'rgba(241,233,214,0.12)', border: '1px solid rgba(241,233,214,0.2)',
+                  borderRadius: 4, fontFamily: 'var(--mono)', fontSize: 8, fontWeight: 700,
+                  letterSpacing: '0.1em', color: 'rgba(241,233,214,0.7)', padding: '5px 10px', cursor: 'pointer',
+                }}
+              >
+                {wordVisible ? 'CACHER' : 'RÉVÉLER'}
+              </button>
             </div>
           </div>
         )}
