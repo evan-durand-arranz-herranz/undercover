@@ -261,13 +261,10 @@ export default function MultiLobby({ socket, onBack }) {
                     <button
                       onClick={() => socket.emit("kick-player", { code: room.code, playerId: p.id })}
                       style={{
-                        background: 'transparent', border: '1px solid var(--line)', borderRadius: 4,
-                        fontFamily: 'var(--mono)', fontSize: 9, fontWeight: 700, letterSpacing: '0.1em',
-                        color: 'var(--accent)', padding: '3px 8px', cursor: 'pointer',
+                        background: 'transparent', border: 'none', cursor: 'pointer',
+                        color: 'var(--muted)', fontSize: 18, padding: 4,
                       }}
-                    >
-                      ✕
-                    </button>
+                    >×</button>
                   )}
                 </div>
               </div>

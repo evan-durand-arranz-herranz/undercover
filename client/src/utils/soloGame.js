@@ -74,10 +74,6 @@ export function createSoloGame(playerNames, includeWhiteCard) {
   let undercoverCount = n <= 5 ? 1 : n <= 8 ? 2 : 3;
   let mrWhiteCount = includeWhiteCard ? 1 : 0;
 
-  while (undercoverCount + mrWhiteCount >= Math.floor(n / 2)) {
-    if (mrWhiteCount > 0) mrWhiteCount--;
-    else undercoverCount--;
-  }
 
   const pair = WORD_PAIRS[Math.floor(Math.random() * WORD_PAIRS.length)];
   const roles = [];

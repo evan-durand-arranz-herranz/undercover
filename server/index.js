@@ -53,10 +53,6 @@ function assignRoles(players, includeWhiteCard) {
   let mrWhiteCount = includeWhiteCard ? 1 : 0;
 
   // S'assure qu'il y a toujours plus de civils
-  while (undercoverCount + mrWhiteCount >= Math.floor(n / 2)) {
-    if (mrWhiteCount > 0) mrWhiteCount--;
-    else undercoverCount--;
-  }
 
   const wordPair = getRandomWordPair();
   const roles = [];
