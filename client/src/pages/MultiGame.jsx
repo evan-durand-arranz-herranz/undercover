@@ -5,9 +5,9 @@ import GameOver from "../components/GameOver";
 import { Silhouette, Stamp } from "../components/ui";
 import "./MultiGame.css";
 
-export default function MultiGame({ socket, initialRoom, onHome }) {
+export default function MultiGame({ socket, initialRoom, initialRole, onHome }) {
   const [room, setRoom] = useState(initialRoom);
-  const [myRole, setMyRole] = useState(null);
+  const [myRole, setMyRole] = useState(initialRole ?? null);
   const [voteResult, setVoteResult] = useState(null);
   const [myVote, setMyVote] = useState(null);
   const [gameOver, setGameOver] = useState(null);

@@ -13,6 +13,7 @@ export default function App() {
   const [screen, setScreen] = useState("home"); // home | solo-setup | solo-game | multi-lobby | multi-game
   const [soloConfig, setSoloConfig] = useState(null); // { players, includeWhite }
   const [multiRoom, setMultiRoom] = useState(null);
+  const [myRole, setMyRole] = useState(null);
 
   const socketRef = useRef(null);
 
@@ -25,17 +26,9 @@ export default function App() {
     });
     socketRef.current = socket;
 
-    // When game starts in multi, switch to game screen
-    socket.on("room-updated", (room) => {
-      setMultiRoom(room);
-      if (room.phase !== "lobby" && screen === "multi-lobby") {
-        setScreen("multi-game");
-      }
-      // If host restarts, go back to lobby
-      if (room.phase === "lobby" && screen === "multi-game") {
-        setScreen("multi-lobby");
-      }
-    });
+    // your-role arrives before room-updated triggers the screen switch,
+    // so we capture it here (App is always mounted) to avoid missing the event.
+    socket.on("your-role", (role) => setMyRole(role));
 
     return () => socket.disconnect();
   }, []); // eslint-disable-line
@@ -51,6 +44,7 @@ export default function App() {
         setScreen("multi-game");
       }
       if (room.phase === "lobby" && screen === "multi-game") {
+        setMyRole(null);
         setScreen("multi-lobby");
       }
     };
@@ -101,6 +95,7 @@ export default function App() {
         <MultiGame
           socket={socketRef.current}
           initialRoom={multiRoom}
+          initialRole={myRole}
           onHome={() => setScreen("home")}
         />
       )}
