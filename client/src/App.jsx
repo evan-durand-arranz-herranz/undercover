@@ -43,10 +43,8 @@ export default function App() {
       if (room.phase !== "lobby" && screen === "multi-lobby") {
         setScreen("multi-game");
       }
-      if (room.phase === "lobby" && screen === "multi-game") {
-        setMyRole(null);
-        setScreen("multi-lobby");
-      }
+      // After restart, room.phase goes back to "lobby" but we stay on multi-game
+      // so MultiGame can render the lobby view directly (avoids race condition).
     };
 
     socket.on("room-updated", handleRoomUpdate);
@@ -97,7 +95,7 @@ export default function App() {
           socket={socketRef.current}
           initialRoom={multiRoom}
           initialRole={myRole}
-          onHome={() => setScreen("home")}
+          onHome={() => { setMultiRoom(null); setScreen("home"); }}
         />
       )}
     </>
