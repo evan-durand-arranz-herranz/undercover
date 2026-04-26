@@ -263,6 +263,18 @@ io.on("connection", (socket) => {
     cb?.({ success: true, allVoted });
   });
 
+  // --- EXCLURE UN JOUEUR ---
+  socket.on("kick-player", ({ code, playerId }, cb) => {
+    const room = rooms[code];
+    if (!room || room.hostId !== socket.id) return cb?.({ success: false });
+    if (room.phase !== "lobby") return cb?.({ success: false });
+    if (playerId === socket.id) return cb?.({ success: false });
+    room.players = room.players.filter((p) => p.id !== playerId);
+    io.to(playerId).emit("kicked");
+    io.to(code).emit("room-updated", publicRoomState(room));
+    cb?.({ success: true });
+  });
+
   // --- [DEV] AJOUTER DES BOTS ---
   socket.on("add-fake-players", ({ code, count = 3 }, cb) => {
     const room = rooms[code];

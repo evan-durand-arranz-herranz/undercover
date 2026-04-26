@@ -16,8 +16,10 @@ export default function MultiLobby({ socket, onBack }) {
     if (!socket) return;
     setMyId(socket.id);
     const onRoomUpdated = (r) => setRoom(r);
+    const onKicked = () => { setRoom(null); setView("choice"); setError("Tu as été exclu de la room."); };
     socket.on("room-updated", onRoomUpdated);
-    return () => socket.off("room-updated", onRoomUpdated);
+    socket.on("kicked", onKicked);
+    return () => { socket.off("room-updated", onRoomUpdated); socket.off("kicked", onKicked); };
   }, [socket]);
 
   const handleCreate = () => {
@@ -240,7 +242,7 @@ export default function MultiLobby({ socket, onBack }) {
                     {p.id === room.hostId ? 'HÔTE · OPÉRATEUR' : 'AGENT'}
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: 6 }}>
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                   {p.id === myId && (
                     <div style={{
                       fontFamily: 'var(--mono)', fontSize: 9, fontWeight: 700, letterSpacing: '0.14em',
@@ -254,6 +256,18 @@ export default function MultiLobby({ socket, onBack }) {
                       padding: '4px 8px', borderRadius: 4,
                       background: 'transparent', color: 'var(--muted)', border: '1px solid var(--line)',
                     }}>DÉCO</div>
+                  )}
+                  {isHost && p.id !== myId && (
+                    <button
+                      onClick={() => socket.emit("kick-player", { code: room.code, playerId: p.id })}
+                      style={{
+                        background: 'transparent', border: '1px solid var(--line)', borderRadius: 4,
+                        fontFamily: 'var(--mono)', fontSize: 9, fontWeight: 700, letterSpacing: '0.1em',
+                        color: 'var(--accent)', padding: '3px 8px', cursor: 'pointer',
+                      }}
+                    >
+                      ✕
+                    </button>
                   )}
                 </div>
               </div>
