@@ -55,7 +55,7 @@ export default function App() {
 
   const handleSelectMode = (mode) => {
     if (mode === "solo") setScreen("solo-setup");
-    else setScreen("multi-lobby");
+    else { setMultiRoom(null); setScreen("multi-lobby"); }
   };
 
   const handleSoloStart = (players, includeWhite) => {
@@ -87,7 +87,8 @@ export default function App() {
       {screen === "multi-lobby" && (
         <MultiLobby
           socket={socketRef.current}
-          onBack={() => setScreen("home")}
+          initialRoom={multiRoom}
+          onBack={() => { setMultiRoom(null); setScreen("home"); }}
         />
       )}
 

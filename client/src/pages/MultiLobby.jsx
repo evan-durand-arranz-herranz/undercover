@@ -2,12 +2,12 @@ import { useState, useEffect } from "react";
 import { Silhouette } from "../components/ui";
 import "./MultiLobby.css";
 
-export default function MultiLobby({ socket, onBack }) {
-  const [view, setView] = useState("choice"); // choice | create | join | waiting
+export default function MultiLobby({ socket, initialRoom, onBack }) {
+  const [view, setView] = useState(initialRoom ? "waiting" : "choice"); // choice | create | join | waiting
   const [name, setName] = useState("");
   const [joinCode, setJoinCode] = useState("");
   const [error, setError] = useState("");
-  const [room, setRoom] = useState(null);
+  const [room, setRoom] = useState(initialRoom ?? null);
   const [myId, setMyId] = useState(null);
   const [includeWhite, setIncludeWhite] = useState(false);
   const [loading, setLoading] = useState(false);
