@@ -1,14 +1,6 @@
 import { useState } from "react";
 import { Silhouette, Stamp } from "./ui";
-import "./RoleReveal.css";
 
-const ROLE_CONFIG = {
-  mrwhite: {
-    label: "MR WHITE",
-    color: "var(--gold)",
-    desc: "Tu n'as pas de mot. Écoute les autres et improvise.",
-  },
-};
 
 export default function RoleReveal({ player, playerIndex, totalPlayers, visible, onAcknowledge }) {
   const [revealed, setRevealed] = useState(false);

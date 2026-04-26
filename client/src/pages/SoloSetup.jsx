@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Silhouette, DossierHeader } from "../components/ui";
-import "./SoloSetup.css";
 
 export default function SoloSetup({ onStart, onBack }) {
   const [players, setPlayers] = useState(["", ""]);

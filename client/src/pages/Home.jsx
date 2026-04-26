@@ -1,5 +1,4 @@
 import { Stamp, Silhouette } from "../components/ui";
-import "./Home.css";
 
 export default function Home({ onSelectMode }) {
   return (

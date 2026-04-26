@@ -1,5 +1,4 @@
 import { Silhouette } from "./ui";
-import "./VoteResult.css";
 
 const ROLE_LABEL = { civil: "CIVIL", undercover: "UNDERCOVER", mrwhite: "MR WHITE" };
 

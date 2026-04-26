@@ -3,34 +3,7 @@ import VotePanel from "../components/VotePanel";
 import VoteResult from "../components/VoteResult";
 import GameOver from "../components/GameOver";
 import { Silhouette, Stamp } from "../components/ui";
-import "./MultiGame.css";
 
-const ROLE_COLOR = { civil: '#2F5D3A', undercover: '#7B0E1F', mrwhite: '#C9A227' };
-
-function DevBotPanel({ players, eliminated = [] }) {
-  const bots = players.filter((p) => p.isBot);
-  if (!bots.length) return null;
-  return (
-    <div style={{ margin: '16px 20px 0', border: '1.5px dashed #b8860b', borderRadius: 8, padding: '12px 14px' }}>
-      <div style={{ fontFamily: 'var(--mono)', fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', color: '#b8860b', marginBottom: 10 }}>[DEV] RÔLES DES BOTS</div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {bots.map((p) => (
-          <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 8, opacity: eliminated.includes(p.id) ? 0.45 : 1 }}>
-            <div style={{ fontFamily: 'var(--serif)', fontSize: 13, flex: 1, color: 'var(--ink)' }}>{p.name}</div>
-            <div style={{
-              fontFamily: 'var(--mono)', fontSize: 8, fontWeight: 700, letterSpacing: '0.1em',
-              padding: '2px 6px', borderRadius: 3,
-              background: ROLE_COLOR[p.role] || 'var(--ink)', color: '#fff',
-            }}>{p.role?.toUpperCase() || '?'}</div>
-            <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: '#b8860b', minWidth: 60, textAlign: 'right' }}>
-              {p.word || '???'}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 export default function MultiGame({ socket, initialRoom, initialRole, onHome }) {
   const [room, setRoom] = useState(initialRoom);
@@ -76,7 +49,6 @@ export default function MultiGame({ socket, initialRoom, initialRole, onHome }) 
   const handleStartGame = () => socket.emit("start-game", { code: room.code });
   const handleUpdateSettings = (settings) => socket.emit("update-settings", { code: room.code, settings });
   const handleKick = (playerId) => socket.emit("kick-player", { code: room.code, playerId });
-  const handleAddBots = () => socket.emit("add-fake-players", { code: room.code, count: 3 });
 
   if (!room) return null;
 
@@ -133,7 +105,7 @@ export default function MultiGame({ socket, initialRoom, initialRole, onHome }) 
                 <div style={{ flex: 1 }}>
                   <div style={{ fontFamily: 'var(--serif)', fontSize: 16 }}>{p.name}</div>
                   <div className="mono-label" style={{ fontSize: 9, marginTop: 1 }}>
-                    {p.id === room.hostId ? 'HÔTE · OPÉRATEUR' : p.isBot ? 'BOT' : 'AGENT'}
+                    {p.id === room.hostId ? 'HÔTE · OPÉRATEUR' : 'AGENT'}
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
@@ -187,16 +159,6 @@ export default function MultiGame({ socket, initialRoom, initialRole, onHome }) 
           </div>
         )}
 
-        {isHost && (
-          <div style={{ padding: '12px 20px 0' }}>
-            <button onClick={handleAddBots} style={{
-              width: '100%', padding: '10px', borderRadius: 6, cursor: 'pointer',
-              background: 'transparent', border: '1.5px dashed #b8860b',
-              fontFamily: 'var(--mono)', fontSize: 10, fontWeight: 700,
-              letterSpacing: '0.1em', color: '#b8860b',
-            }}>[DEV] + 3 BOTS</button>
-          </div>
-        )}
 
         <div style={{ padding: '20px 20px 40px', display: 'flex', flexDirection: 'column', gap: 10 }}>
           {isHost ? (
@@ -339,7 +301,6 @@ export default function MultiGame({ socket, initialRoom, initialRole, onHome }) 
           </div>
         </div>
 
-        {isHost && <DevBotPanel players={room.players} eliminated={room.eliminated} />}
 
         <div style={{ padding: '20px 20px 40px' }}>
           {isHost && myRole ? (
@@ -438,7 +399,6 @@ export default function MultiGame({ socket, initialRoom, initialRole, onHome }) 
           </div>
         )}
 
-        {isHost && <DevBotPanel players={room.players} eliminated={room.eliminated} />}
 
         <div style={{ padding: '24px 20px 40px' }}>
           {isHost ? (

@@ -1,5 +1,4 @@
 import { Stamp, Silhouette } from "./ui";
-import "./GameOver.css";
 
 const ROLE_BG = {
   civil:      'var(--green-stamp)',

@@ -36,12 +36,3 @@ export const DossierHeader = ({ num = '07-UNDR', section }) => (
   </div>
 );
 
-export const IDCard = ({ children, style = {} }) => (
-  <div className="id-card" style={{ padding: '22px', position: 'relative', ...style }}>
-    <div className="id-card-corner tl" />
-    <div className="id-card-corner tr" />
-    <div className="id-card-corner bl" />
-    <div className="id-card-corner br" />
-    {children}
-  </div>
-);

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Silhouette } from "./ui";
-import "./VotePanel.css";
 
 export default function VotePanel({
   players, onVoteComplete,

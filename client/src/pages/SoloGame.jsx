@@ -5,7 +5,6 @@ import VotePanel from "../components/VotePanel";
 import VoteResult from "../components/VoteResult";
 import GameOver from "../components/GameOver";
 import { Silhouette } from "../components/ui";
-import "./SoloGame.css";
 
 export default function SoloGame({ players: playerNames, includeWhite, onBack }) {
   const [game, setGame] = useState(() => createSoloGame(playerNames, includeWhite));

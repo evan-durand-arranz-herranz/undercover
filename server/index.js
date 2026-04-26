@@ -31,9 +31,12 @@ function generateRoomCode() {
   return code;
 }
 
-// Sélectionne une paire de mots aléatoire
+// Sélectionne une paire et assigne aléatoirement quel mot est civil / undercover
 function getRandomWordPair() {
-  return WORD_PAIRS[Math.floor(Math.random() * WORD_PAIRS.length)];
+  const pair = WORD_PAIRS[Math.floor(Math.random() * WORD_PAIRS.length)];
+  return Math.random() < 0.5
+    ? { civil: pair[0], undercover: pair[1] }
+    : { civil: pair[1], undercover: pair[0] };
 }
 
 // Mélange un tableau
@@ -93,9 +96,7 @@ function publicRoomState(room) {
       name: p.name,
       connected: p.connected,
       eliminated: room.eliminated.includes(p.id),
-      role: (room.phase === "game-over" || p.isBot) ? p.role : undefined,
-      word: p.isBot ? p.word : undefined,
-      isBot: p.isBot || false,
+      role: room.phase === "game-over" ? p.role : undefined,
     })),
     settings: room.settings,
     phase: room.phase,
@@ -105,17 +106,6 @@ function publicRoomState(room) {
   };
 }
 
-// Auto-vote pour les bots encore en vie
-function autovoteBots(room) {
-  const alive = room.players.filter((p) => !room.eliminated.includes(p.id));
-  const aliveNonBots = alive.filter((p) => !p.isBot);
-  alive.filter((p) => p.isBot).forEach((bot) => {
-    if (!room.votes[bot.id]) {
-      const target = aliveNonBots[Math.floor(Math.random() * aliveNonBots.length)];
-      if (target) room.votes[bot.id] = target.id;
-    }
-  });
-}
 
 io.on("connection", (socket) => {
   console.log(`[connect] ${socket.id}`);
@@ -184,7 +174,6 @@ io.on("connection", (socket) => {
     } else if (room.phase === "discussion") {
       room.phase = "vote";
       room.votes = {};
-      autovoteBots(room);
     } else if (room.phase === "result") {
       // Vérifie fin de partie
       const alive = room.players.filter((p) => !room.eliminated.includes(p.id));
@@ -272,22 +261,6 @@ io.on("connection", (socket) => {
     cb?.({ success: true });
   });
 
-  // --- [DEV] AJOUTER DES BOTS ---
-  socket.on("add-fake-players", ({ code, count = 3 }, cb) => {
-    const room = rooms[code];
-    if (!room || room.hostId !== socket.id || room.phase !== "lobby") return cb?.({ success: false });
-    const botNames = ["Alice", "Bob", "Carlos", "Diana", "Eve", "Frank", "Grace", "Hugo"];
-    for (let i = 0; i < count; i++) {
-      if (room.players.length >= 12) break;
-      const existingBots = room.players.filter((p) => p.isBot).length;
-      const botId = `bot-${Date.now()}-${i}`;
-      const name = botNames[existingBots % botNames.length] || `Bot ${existingBots + 1}`;
-      room.players.push({ id: botId, name, connected: true, isBot: true });
-    }
-    io.to(code).emit("room-updated", publicRoomState(room));
-    cb?.({ success: true });
-  });
-
   // --- REJOUER ---
   socket.on("restart-game", ({ code }, cb) => {
     const room = rooms[code];
@@ -298,9 +271,7 @@ io.on("connection", (socket) => {
     room.roundNumber = 0;
     room.eliminated = [];
     room.votes = {};
-    room.players = room.players
-      .filter((p) => !p.isBot)
-      .map((p) => ({ id: p.id, name: p.name, connected: p.connected }));
+    room.players = room.players.map((p) => ({ id: p.id, name: p.name, connected: p.connected }));
 
     io.to(code).emit("room-updated", publicRoomState(room));
     cb?.({ success: true });
