@@ -9,6 +9,7 @@ export default function MultiGame({ socket, initialRoom, initialRole, onHome }) 
   const [room, setRoom] = useState(initialRoom);
   const [myRole, setMyRole] = useState(initialRole ?? null);
   const [voteResult, setVoteResult] = useState(null);
+  const [mrwhiteResult, setMrwhiteResult] = useState(null);
   const [myVote, setMyVote] = useState(null);
   const [gameOver, setGameOver] = useState(null);
   const [wordPair, setWordPair] = useState(null);
@@ -24,13 +25,16 @@ export default function MultiGame({ socket, initialRoom, initialRole, onHome }) 
     const onRoomUpdated = (r) => { setRoom(r); if (r.phase === "game-over") setGameOver(r); };
     const onYourRole = (data) => setMyRole(data);
     const onVoteResult = (data) => { setVoteResult(data); setMyVote(null); };
+    const onMrwhiteResult = (data) => setMrwhiteResult(data);
     socket.on("room-updated", onRoomUpdated);
     socket.on("your-role", onYourRole);
     socket.on("vote-result", onVoteResult);
+    socket.on("mrwhite-result", onMrwhiteResult);
     return () => {
       socket.off("room-updated", onRoomUpdated);
       socket.off("your-role", onYourRole);
       socket.off("vote-result", onVoteResult);
+      socket.off("mrwhite-result", onMrwhiteResult);
     };
   }, [socket]);
 
@@ -41,9 +45,13 @@ export default function MultiGame({ socket, initialRoom, initialRole, onHome }) 
     socket.emit("vote", { code: room.code, targetId }, (res) => { if (!res?.success) setMyVote(null); });
   };
 
+  const handleVoteMrWhite = (targetId) => {
+    socket.emit("vote-mrwhite", { code: room.code, targetId });
+  };
+
   const handleRestart = () => {
     socket.emit("restart-game", { code: room.code });
-    setMyRole(null); setVoteResult(null); setMyVote(null); setGameOver(null); setWordVisible(false);
+    setMyRole(null); setVoteResult(null); setMrwhiteResult(null); setMyVote(null); setGameOver(null); setWordVisible(false);
   };
 
   const handleStartGame = () => socket.emit("start-game", { code: room.code });
@@ -412,6 +420,116 @@ export default function MultiGame({ socket, initialRoom, initialRole, onHome }) 
             }}>
               <div className="waiting-spinner" />
               <div className="mono-label" style={{ fontSize: 9 }}>LE HOST LANCERA LE VOTE…</div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ── VOTE MR. WHITE ──
+  if (room.phase === "vote-mrwhite") {
+    if (isEliminated) {
+      return (
+        <div className="paper no-scroll" style={{ minHeight: '100dvh', overflow: 'auto' }}>
+          <div style={{ padding: '64px 20px 0' }}>
+            <div className="mono-label" style={{ color: 'var(--accent)' }}>· VOTE EN COURS ·</div>
+            <h1 className="title-serif" style={{ fontSize: 36, lineHeight: 1, margin: '6px 0 0' }}>Qui est<br />Mr. White ?</h1>
+          </div>
+          <div style={{ padding: '20px 20px 40px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ background: 'var(--paper-2)', border: '1px solid var(--line)', borderRadius: 8, padding: '14px 16px' }}>
+              <div className="mono-label" style={{ color: 'var(--muted)' }}>Tu as été éliminé·e — tu observes.</div>
+            </div>
+            <div style={{ background: 'var(--paper-2)', border: '1px solid var(--line)', borderRadius: 10, padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+              <div className="waiting-spinner" />
+              <div className="mono-label" style={{ fontSize: 9 }}>
+                {Object.keys(room.mrwhiteVotes || {}).length}/{alivePlayers.length} ONT VOTÉ…
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return (
+      <VotePanel
+        players={room.players.map((p) => ({ ...p, eliminated: room.eliminated.includes(p.id) }))}
+        isSolo={false}
+        myId={myId}
+        onVote={handleVoteMrWhite}
+        votes={room.mrwhiteVotes || {}}
+        allVoted={Object.keys(room.mrwhiteVotes || {}).length >= alivePlayers.length}
+        voteType="mrwhite"
+      />
+    );
+  }
+
+  // ── RÉSULTAT VOTE MR. WHITE ──
+  if (room.phase === "vote-mrwhite-result") {
+    const res = mrwhiteResult || room.mrwhiteResult;
+    return (
+      <div className="paper-dark no-scroll fade-in" style={{ minHeight: '100dvh', overflow: 'auto', color: 'var(--paper)' }}>
+        <div style={{ padding: '64px 20px 0', textAlign: 'center' }}>
+          <div className="mono-label" style={{ color: 'var(--accent-soft)' }}>· VOTE MR. WHITE ·</div>
+          <div className="mono-label" style={{ color: 'rgba(241,233,214,0.5)', marginTop: 4 }}>PHASE 03A · RÉSULTAT</div>
+        </div>
+
+        {res?.isTie ? (
+          <div style={{ padding: '24px 20px 0', textAlign: 'center' }}>
+            <h1 className="title-serif" style={{ fontSize: 40, lineHeight: 1, color: 'var(--paper)' }}>Égalité</h1>
+            <div style={{ fontFamily: 'var(--sans)', fontSize: 14, color: 'rgba(241,233,214,0.7)', marginTop: 8 }}>
+              Aucun agent identifié comme Mr. White.
+            </div>
+          </div>
+        ) : (
+          <div style={{ padding: '24px 20px 0' }}>
+            <div className="id-card" style={{ padding: '20px', position: 'relative', overflow: 'hidden' }}>
+              <div className="id-card-corner tl" /><div className="id-card-corner tr" />
+              <div className="id-card-corner bl" /><div className="id-card-corner br" />
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14 }}>
+                <div className="mono-label">SUSPECT DÉSIGNÉ</div>
+                <div className="mono-num" style={{ fontSize: 10 }}>VOTE MR. WHITE</div>
+              </div>
+              <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+                <Silhouette size={72} color="var(--ink)" bg="var(--paper-3)" />
+                <div style={{ flex: 1 }}>
+                  <div className="mono-label">NOM DE CODE</div>
+                  <div className="title-serif" style={{ fontSize: 32, lineHeight: 1, color: 'var(--ink)', marginTop: 2 }}>
+                    {res?.pickedName}
+                  </div>
+                  <div style={{
+                    marginTop: 8,
+                    background: res?.wasMrWhite ? 'var(--ink)' : 'var(--green-stamp)',
+                    color: 'var(--paper)',
+                    padding: '4px 8px', borderRadius: 4, display: 'inline-block',
+                    fontFamily: 'var(--mono)', fontSize: 10, fontWeight: 700, letterSpacing: '0.16em',
+                  }}>
+                    {res?.wasMrWhite ? "MR WHITE — ÉLIMINÉ" : "PAS MR. WHITE"}
+                  </div>
+                  {!res?.wasMrWhite && (
+                    <div style={{ fontFamily: 'var(--sans)', fontSize: 12, color: 'var(--ink-soft)', marginTop: 6 }}>
+                      Reste en jeu — peut être l'undercover.
+                    </div>
+                  )}
+                </div>
+              </div>
+              {res?.wasMrWhite && (
+                <div style={{ position: 'absolute', top: '50%', left: '50%', '--rot': '-14deg', animation: 'stampDrop 0.8s cubic-bezier(0.34, 1.4, 0.64, 1) 0.3s both' }}>
+                  <div className="stamp stamp-red" style={{ fontSize: 28, padding: '5px 14px 4px', borderWidth: 3, transform: 'rotate(-14deg)' }}>ÉLIMINÉ</div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        <div style={{ padding: '24px 20px 40px' }}>
+          {isHost ? (
+            <button className="btn-accent" onClick={handleNextPhase}>
+              Passer au vote undercover →
+            </button>
+          ) : (
+            <div style={{ background: 'rgba(241,233,214,0.06)', border: '1px solid rgba(241,233,214,0.1)', borderRadius: 10, padding: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+              <div className="waiting-spinner" />
+              <div className="mono-label" style={{ color: 'rgba(241,233,214,0.5)', fontSize: 9 }}>EN ATTENTE DU HOST…</div>
             </div>
           )}
         </div>

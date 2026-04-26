@@ -4,6 +4,7 @@ import { Silhouette } from "./ui";
 export default function VotePanel({
   players, onVoteComplete,
   isSolo = false, myId = null, onVote = null, votes = {}, allVoted = false,
+  voteType = "undercover",
 }) {
   const [selectedTarget, setSelectedTarget] = useState(null);
 
@@ -77,6 +78,8 @@ export default function VotePanel({
   const iHaveVoted = !!myVote;
   const totalVoted = Object.keys(votes).length;
 
+  const isMrWhiteVote = voteType === "mrwhite";
+
   const handleMultiVote = () => {
     if (selectedTarget === null) return;
     onVote(selectedTarget);
@@ -86,13 +89,17 @@ export default function VotePanel({
     <div className="paper no-scroll" style={{ minHeight: '100dvh', overflow: 'auto' }}>
       <div style={{ padding: '64px 20px 0' }}>
         <div className="mono-label" style={{ color: 'var(--accent)' }}>· VOTE EN COURS ·</div>
-        <div className="mono-label" style={{ marginTop: 4 }}>PHASE 03 · ÉLIMINATION</div>
+        <div className="mono-label" style={{ marginTop: 4 }}>
+          {isMrWhiteVote ? "PHASE 03A · MR. WHITE" : "PHASE 03B · ÉLIMINATION"}
+        </div>
         <h1 className="title-serif" style={{ fontSize: 36, lineHeight: 1, margin: '6px 0 0' }}>
-          Désigne<br />l'imposteur
+          {isMrWhiteVote ? <>Qui est<br />Mr. White ?</> : <>Désigne<br />l'imposteur</>}
         </h1>
         {!iHaveVoted ? (
           <div style={{ fontFamily: 'var(--sans)', fontSize: 13, color: 'var(--ink-soft)', marginTop: 8 }}>
-            Choisis l'agent le plus suspect.
+            {isMrWhiteVote
+              ? "Votez pour l'agent que vous suspectez d'être Mr. White."
+              : "Choisis l'agent le plus suspect."}
           </div>
         ) : (
           <div style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--green-stamp)', marginTop: 8, letterSpacing: '0.1em' }}>
@@ -137,7 +144,7 @@ export default function VotePanel({
           </div>
           <div style={{ padding: '20px 20px 40px' }}>
             <button className="btn-accent" disabled={selectedTarget === null} onClick={handleMultiVote}>
-              Confirmer mon vote
+              {isMrWhiteVote ? "Voter pour Mr. White" : "Confirmer mon vote"}
               <span style={{ fontSize: 14 }}>→</span>
             </button>
           </div>

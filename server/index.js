@@ -69,6 +69,16 @@ function assignRoles(players, includeWhiteCard) {
   return players.map((p, i) => ({ ...p, ...shuffled[i] }));
 }
 
+// Vérifie la condition de victoire
+function checkWin(players, eliminated) {
+  const alive = players.filter((p) => !eliminated.includes(p.id));
+  const aliveUndercovers = alive.filter((p) => p.role === "undercover");
+  const aliveCivilsAndWhite = alive.filter((p) => p.role !== "undercover");
+  if (aliveUndercovers.length === 0) return "civil";
+  if (aliveUndercovers.length >= aliveCivilsAndWhite.length) return "undercover";
+  return null;
+}
+
 // État d'une room
 function createRoom(hostId, hostName, settings) {
   return {
@@ -103,6 +113,8 @@ function publicRoomState(room) {
     roundNumber: room.roundNumber,
     eliminated: room.eliminated,
     votes: room.phase === "vote" || room.phase === "result" ? room.votes : {},
+    mrwhiteVotes: room.phase === "vote-mrwhite" ? room.mrwhiteVotes || {} : {},
+    mrwhiteResult: room.phase === "vote-mrwhite-result" ? room.mrwhiteResult || null : null,
   };
 }
 
@@ -172,20 +184,26 @@ io.on("connection", (socket) => {
     if (room.phase === "role-reveal") {
       room.phase = "discussion";
     } else if (room.phase === "discussion") {
+      const hasMrWhite = room.players.some(
+        (p) => !room.eliminated.includes(p.id) && p.role === "mrwhite"
+      );
+      if (hasMrWhite) {
+        room.phase = "vote-mrwhite";
+        room.mrwhiteVotes = {};
+      } else {
+        room.phase = "vote";
+        room.votes = {};
+      }
+    } else if (room.phase === "vote-mrwhite-result") {
       room.phase = "vote";
       room.votes = {};
+      room.mrwhiteVotes = {};
+      room.mrwhiteResult = null;
     } else if (room.phase === "result") {
-      // Vérifie fin de partie
-      const alive = room.players.filter((p) => !room.eliminated.includes(p.id));
-      const aliveUndercovers = alive.filter((p) => p.role === "undercover");
-      const aliveCivilsAndWhite = alive.filter((p) => p.role !== "undercover");
-
-      if (aliveUndercovers.length === 0) {
+      const winner = checkWin(room.players, room.eliminated);
+      if (winner) {
         room.phase = "game-over";
-        room.winner = "civil";
-      } else if (aliveUndercovers.length >= aliveCivilsAndWhite.length) {
-        room.phase = "game-over";
-        room.winner = "undercover";
+        room.winner = winner;
       } else {
         room.phase = "discussion";
         room.roundNumber++;
@@ -249,6 +267,62 @@ io.on("connection", (socket) => {
     cb?.({ success: true, allVoted });
   });
 
+  // --- VOTER POUR MR. WHITE ---
+  socket.on("vote-mrwhite", ({ code, targetId }, cb) => {
+    const room = rooms[code];
+    if (!room || room.phase !== "vote-mrwhite") return cb?.({ success: false });
+    if (room.eliminated.includes(socket.id)) return cb?.({ success: false });
+
+    if (!room.mrwhiteVotes) room.mrwhiteVotes = {};
+    room.mrwhiteVotes[socket.id] = targetId;
+
+    const alivePlayers = room.players.filter((p) => !room.eliminated.includes(p.id));
+    const allVoted = alivePlayers.every((p) => room.mrwhiteVotes[p.id]);
+
+    io.to(code).emit("room-updated", publicRoomState(room));
+
+    if (allVoted) {
+      const voteCounts = {};
+      Object.values(room.mrwhiteVotes).forEach((id) => {
+        voteCounts[id] = (voteCounts[id] || 0) + 1;
+      });
+      const maxVotes = Math.max(...Object.values(voteCounts));
+      const topVoted = Object.entries(voteCounts)
+        .filter(([, c]) => c === maxVotes)
+        .map(([id]) => id);
+
+      const isTie = topVoted.length > 1;
+      const pickedId = isTie ? null : topVoted[0];
+      const pickedPlayer = pickedId ? room.players.find((p) => p.id === pickedId) : null;
+      const wasMrWhite = pickedPlayer?.role === "mrwhite";
+
+      if (wasMrWhite && pickedId) {
+        room.eliminated.push(pickedId);
+      }
+
+      const winner = checkWin(room.players, room.eliminated);
+      if (winner) {
+        room.phase = "game-over";
+        room.winner = winner;
+      } else {
+        room.phase = "vote-mrwhite-result";
+        room.mrwhiteResult = {
+          pickedId,
+          pickedName: pickedPlayer?.name,
+          wasMrWhite,
+          isTie,
+          votes: { ...room.mrwhiteVotes },
+          voteCounts,
+        };
+        io.to(code).emit("mrwhite-result", room.mrwhiteResult);
+      }
+
+      io.to(code).emit("room-updated", publicRoomState(room));
+    }
+
+    cb?.({ success: true, allVoted });
+  });
+
   // --- EXCLURE UN JOUEUR ---
   socket.on("kick-player", ({ code, playerId }, cb) => {
     const room = rooms[code];
@@ -271,6 +345,8 @@ io.on("connection", (socket) => {
     room.roundNumber = 0;
     room.eliminated = [];
     room.votes = {};
+    room.mrwhiteVotes = {};
+    room.mrwhiteResult = null;
     room.players = room.players.map((p) => ({ id: p.id, name: p.name, connected: p.connected }));
 
     io.to(code).emit("room-updated", publicRoomState(room));
