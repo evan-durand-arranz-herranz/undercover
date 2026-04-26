@@ -303,6 +303,22 @@ export default function MultiLobby({ socket, onBack }) {
           </div>
         )}
 
+        {isHost && (
+          <div style={{ padding: '0 20px', marginBottom: 4 }}>
+            <button
+              onClick={() => socket.emit("add-fake-players", { code: room.code, count: 3 })}
+              style={{
+                width: '100%', padding: '10px', borderRadius: 6, cursor: 'pointer',
+                background: 'transparent', border: '1.5px dashed #b8860b',
+                fontFamily: 'var(--mono)', fontSize: 10, fontWeight: 700,
+                letterSpacing: '0.1em', color: '#b8860b',
+              }}
+            >
+              [DEV] + 3 BOTS
+            </button>
+          </div>
+        )}
+
         <div style={{ padding: '20px 20px 40px', display: 'flex', flexDirection: 'column', gap: 10 }}>
           {isHost ? (
             <button
